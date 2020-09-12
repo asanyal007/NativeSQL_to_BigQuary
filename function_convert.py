@@ -1,21 +1,34 @@
 import keyword_maps
 import re
 keywords_map = keyword_maps.keywords_map
-function_map = keyword_maps.function_map
 
 def map_function(str1):
     converted = {}
     for a in range(str1.count('(')):
         func_parameters = {}
         ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+[)]|[)]))"
+        ptr = "[^aA-zZ][^0-9 \W]+"
         matches = re.findall(ptrn, str1)
-        l_param = matches[0][1].replace(')', '').split(',')
+        print(matches)
+
+        for keys in keywords_map.keys():
+            if matches[0][0].split('(')[0] in keys.split('(')[0]:
+                delm = re.findall(ptr, keys)
+                l_param = matches[0][1].replace(')', '')
+                for d in delm:
+                    print(d)
+                    l_param = re.sub(d, ',', l_param)
+            else:
+                l_param = matches[0][1].replace(')', '')
+
+        l_param = l_param.split(',')
         i = 0
         for val in l_param:
             i = i + 1
             func_parameters[i] = val
         str1 = str1.replace(matches[0][0], 'x')
         converted[matches[0][0].split('(')[0]] = func_parameters
+
 
     # Convert arguments
     for k, v in converted.items():
@@ -27,10 +40,11 @@ def map_function(str1):
     # Convert keys
     new_dict = {}
     for k, v in converted.items():
-        if k in keywords_map.keys():
-            new_dict[keywords_map[k]] = v
-        else:
-            new_dict[k] = v
+        for key in keywords_map.keys():
+            if k in key.split('(')[0]:
+                new_dict[keywords_map[key]] = v
+            else:
+                new_dict[k] = v
 
     list_of_part = []
     for k, v in new_dict.items():
@@ -40,10 +54,10 @@ def map_function(str1):
 
     final = []
     for i, e in list(enumerate(list_of_part)):
+        print(e)
         if len(final) < 1:
             final.append(e)
         else:
             final.append(e.replace('x', final[i - 1]))
-    return final[-1]
 
-print(map_function("dateadd('month',-6,convert_timezone('America/Los_Angeles',to_date(current_timestamp)))"))
+    return final[-1]

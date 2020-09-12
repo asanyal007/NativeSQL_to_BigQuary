@@ -13,6 +13,6 @@ sql_as_string = sql_file.read()
 ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+[)]|[)]))"
 functions_in_file = re.findall(ptrn, sql_as_string)
 for matches in functions_in_file:
-    print(matches)
+    #print(matches)
     print(matches, function_convert.map_function(matches[0]))
 
