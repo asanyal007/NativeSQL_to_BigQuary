@@ -7,5 +7,11 @@ keywords_map = {'dateadd' : 'DATE_ADD(x,INTERVAL 2 1)',
                 "hour" : 'HOUR',
                 'date_part': "EXTRACT(1 FROM 2)",
                 'dow' : 'DAYOFWEEK',
-                'extract(1 from 2)' : 'EXTRACT(1 FROM 2)'
+                'extract(1 from 2)' : 'EXTRACT(1 FROM 2)',
+                'max' : 'MAX(1)',
+                'sum' : 'SUM(1)',
+                'date_trunc' :'TIMESTAMP_TRUNC(2, 1)',
+                'over' : 'OVER (PARTITION BY 1)',
+                'timestamp_ltz' : 'TIMESTAMP',
+                'timestamp_ntz' : 'TIMESTAMP',
                 }

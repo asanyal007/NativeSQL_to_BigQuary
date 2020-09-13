@@ -9,14 +9,12 @@ def map_function(str1):
         ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+[)]|[)]))"
         ptr = "[^aA-zZ][^0-9 \W]+"
         matches = re.findall(ptrn, str1)
-        print(matches)
-
+        #print(matches)
         for keys in keywords_map.keys():
             if matches[0][0].split('(')[0] in keys.split('(')[0]:
                 delm = re.findall(ptr, keys)
                 l_param = matches[0][1].replace(')', '')
                 for d in delm:
-                    print(d)
                     l_param = re.sub(d, ',', l_param)
             else:
                 l_param = matches[0][1].replace(')', '')
@@ -54,7 +52,6 @@ def map_function(str1):
 
     final = []
     for i, e in list(enumerate(list_of_part)):
-        print(e)
         if len(final) < 1:
             final.append(e)
         else:
