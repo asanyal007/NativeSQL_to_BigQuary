@@ -3,16 +3,33 @@ import re
 import difflib
 import function_convert
 
-def create_map(matches_main, matches_fallback, dict_transaformed, file_name):
-    list_of_functions = []
-    for a in matches_main:
-        #if re.findall(' ', a[0]):
-        list_of_functions.append(a)
-    #print(list_of_functions)
-    for b in matches_fallback:
-        if re.findall('\((.*?)\)', b[0]) and b not in list_of_functions:
-            list_of_functions.append(b[0])
-    for matches in list_of_functions:
+def get_functions(sql_as_string):
+    open_br = 0
+    closed_br = 0
+    list_of_function = []
+    i = 0
+    ptr = "[aA-zA_]+[(']+\w.*?\)+"
+    list_of_fun_name = [a.split("(")[0] for a in re.findall(ptr, sql_as_string)]
+    for s in list_of_fun_name:
+        start = sql_as_string.find(s + "(")
+        sub_str = sql_as_string[start:len(sql_as_string)]
+        for a in sub_str:
+            i = i + 1
+            if "(" in a:
+                open_br = open_br + 1
+            elif ")" in a:
+                closed_br = closed_br + 1
+            if (open_br + closed_br) > 0 and (open_br == closed_br):
+                list_of_function.append(sub_str[0:i])
+                open_br = 0
+                closed_br = 0
+                i = 0
+                break
+                # sub_str = ""
+    return list(set(list_of_function))
+
+def create_map(all_functions, dict_transaformed, file_name):
+    for matches in all_functions:
         dict_transaformed[matches] = function_convert.map_function(matches)
 
     df_converted_func = pd.DataFrame.from_dict(dict_transaformed, orient='index').reset_index()
