@@ -6,9 +6,9 @@ import function_convert
 def create_map(matches_main, matches_fallback, dict_transaformed, file_name):
     list_of_functions = []
     for a in matches_main:
-        if re.findall('\((.*?)\)', a[0]):
-            list_of_functions.append(a[0])
-
+        #if re.findall(' ', a[0]):
+        list_of_functions.append(a)
+    #print(list_of_functions)
     for b in matches_fallback:
         if re.findall('\((.*?)\)', b[0]) and b not in list_of_functions:
             list_of_functions.append(b[0])
