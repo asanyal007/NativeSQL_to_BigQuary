@@ -60,4 +60,4 @@ def map_function(str1):
     if final:
         return final[-1]
     else:
-        return final
+        return "Not Available"

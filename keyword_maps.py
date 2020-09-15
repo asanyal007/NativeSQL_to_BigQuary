@@ -14,7 +14,7 @@ keywords_map = {'dateadd' : 'DATE_ADD(x,INTERVAL 2 1)',
                 'timestamp_ltz' : 'TIMESTAMP',
                 'timestamp_ntz' : 'TIMESTAMP',
                 'abc' : 'ABC',
-                'hello(1,2)' : 'HELLO(2,1)',
+                'hello(1,2)' : '2((2(1)))',
                 'xyz(1)' : 'XYZ(1)',
                 'rrt(1)' : 'RRT(1)'
                 }
