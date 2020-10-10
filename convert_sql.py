@@ -48,8 +48,9 @@ def convert(sql_as_string,file_path,out_path):
     sql_as_string = sql_file.read()
     for s in map['SQL_Functions']:
         replace_str = map[map['SQL_Functions'] == s]['Converted_Functions'].iloc[0]
-        print("replace_str: ", str(replace_str))
-        if not replace_str == "Not Available":
+
+        if replace_str != "Not Available":
+            print("replace_str: ", s,str(replace_str))
             sql_as_string = sql_as_string.replace(s,replace_str)
     return sql_as_string
 

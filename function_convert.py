@@ -9,7 +9,7 @@ def map_function(str1):
         func_parameters = {}
         ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+)[)])"
         matches = re.findall(ptrn, str1)
-        print(str1, matches)
+        #print(str1, matches)
 
         if matches:
             if 'from' in matches[0][1]:
