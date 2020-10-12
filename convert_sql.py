@@ -10,6 +10,7 @@ def get_functions(sql_as_string):
     i = 0
     ptr = "[aA-zA_]+[(']+\w.*?\)+"
     list_of_fun_name = [a.split("(")[0] for a in re.findall(ptr, sql_as_string)]
+    list_of_fun_name_new =  re.findall(ptr, sql_as_string)
     for s in list_of_fun_name:
         start = sql_as_string.find(s + "(")
         sub_str = sql_as_string[start:len(sql_as_string)]
@@ -26,11 +27,11 @@ def get_functions(sql_as_string):
                 i = 0
                 break
                 # sub_str = ""
-    return list(set(list_of_function))
+    return list(set(list_of_function+list_of_fun_name_new))
 
-def create_map(all_functions, dict_transaformed, file_name):
+def create_map(all_functions, dict_transaformed, file_name, ptrn):
     for matches in all_functions:
-        dict_transaformed[matches] = function_convert.map_function(matches)
+        dict_transaformed[re.findall(ptrn, matches)[0][0]] = function_convert.map_function(matches)
 
     df_converted_func = pd.DataFrame.from_dict(dict_transaformed, orient='index').reset_index()
     df_converted_func = df_converted_func.rename(columns={'index': 'SQL_Functions', 0: 'Converted_Functions'},
