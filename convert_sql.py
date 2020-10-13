@@ -9,8 +9,11 @@ def get_functions(sql_as_string):
     list_of_function = []
     i = 0
     ptr = "[aA-zA_]+[(']+\w.*?\)+"
+    ptr2 = r"[aA-zA]\''.*?"
     list_of_fun_name = [a.split("(")[0] for a in re.findall(ptr, sql_as_string)]
+    list_of_fun_column_names = re.findall(ptr2, sql_as_string)
     list_of_fun_name_new =  re.findall(ptr, sql_as_string)
+    list_of_fun_name.append("contains")
     for s in list_of_fun_name:
         start = sql_as_string.find(s + "(")
         sub_str = sql_as_string[start:len(sql_as_string)]
@@ -27,7 +30,7 @@ def get_functions(sql_as_string):
                 i = 0
                 break
                 # sub_str = ""
-    return list(set(list_of_function+list_of_fun_name_new))
+    return list(set(list_of_function+list_of_fun_name_new+list_of_fun_name_new))
 
 def create_map(all_functions, dict_transaformed, file_name, ptrn):
     for matches in all_functions:

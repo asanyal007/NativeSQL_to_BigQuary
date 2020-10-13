@@ -17,7 +17,7 @@ onlyfiles = [file_path+f for f in listdir(file_path) if isfile(join(file_path, f
 
 
 main_ptrn = "[aA-zA_]+[(']+\w.*?\)+"
-fallback_ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+[)]|[)]))"
+fallback_ptrn = "\s*([a-zA-Z_]\w*[(](\s*[a-zA-Z_]\w*[(]|[^()]+)[)])"
 ptr = "[^aA-zZ][^0-9 \W]+"
 
 
@@ -27,6 +27,7 @@ for file in onlyfiles:
     sql_file = open(file)
     sql_as_string = sql_file.read()
     dict_transaformed = pre_process.doublecolon_to_standard_cast(sql_as_string)
+    df_regex_map = pre_process.regex_replace(sql_as_string, keyword_maps.regex_map)
     file_name = file.split(r"/")[-1].split('.')[0]
     all_functions = convert_sql.get_functions(sql_as_string)
     print(all_functions)
@@ -34,7 +35,7 @@ for file in onlyfiles:
     ''' create list of functions conversons to be made'''
     df_converted_func = convert_sql.create_map(all_functions, dict_transaformed, file_name, fallback_ptrn)
     df_direct_conv = function_convert.map_direct(keyword_maps.direct_conversion)
-    new_df = pd.concat([df_converted_func, df_direct_conv ]).reset_index()
+    new_df = pd.concat([df_converted_func, df_direct_conv, df_regex_map ]).reset_index()
     new_df.to_csv(r"venv\\Func_Dict\\{}.csv".format(file_name))
 
     ''' Creating converted SQL files based on the list'''
