@@ -25,3 +25,6 @@ def doublecolon_to_standard_cast(sql_as_string):
             y = re.findall('[^::]+',each)[1]
         final[each] = "CAST({} AS {})".format(x,y)
     return final
+
+
+

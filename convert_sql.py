@@ -31,7 +31,10 @@ def get_functions(sql_as_string):
 
 def create_map(all_functions, dict_transaformed, file_name, ptrn):
     for matches in all_functions:
-        dict_transaformed[re.findall(ptrn, matches)[0][0]] = function_convert.map_function(matches)
+        try:
+            dict_transaformed[re.findall(ptrn, matches)[0][0]] = function_convert.map_function(matches)
+        except:
+            dict_transaformed["-"] = function_convert.map_function(matches)
 
     df_converted_func = pd.DataFrame.from_dict(dict_transaformed, orient='index').reset_index()
     df_converted_func = df_converted_func.rename(columns={'index': 'SQL_Functions', 0: 'Converted_Functions'},

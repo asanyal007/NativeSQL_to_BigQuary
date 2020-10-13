@@ -1,23 +1,27 @@
-keywords_map = {'dateadd' : 'DATE_ADD(x,INTERVAL 2 1)',
+keywords_map = {'dateadd(1_, 2_, 3_)' : 'DATE_ADD(3_,INTERVAL 2_ 1_)',
                 'current_timestamp' : 'CURRENT_TIMESTAMP()',
                 "'month'" : 'MONTH',
-                'convert_timezone' : 'DATE(2,1)',
+                'convert_timezone' : 'DATE(2_,1_)',
                 'to_date' : 'to_date(1)',
                 "'hour'" : 'HOUR',
-                "hour" : 'HOUR',
-                'date_part': "EXTRACT(1 FROM 2)",
-                'dow ': 'DAYOFWEEK',
-                'extract(1 from 2)' : 'EXTRACT(1 FROM 2)',
-                'lower' : 'LOWER(1)',
-                'sum' : 'SUM(1)',
-                'date_trunc' :'TIMESTAMP_TRUNC(2, 1)',
+                "'year'" : 'YEAR',
+                'contains(1_,2_)' : 'REGEXP_CONTAINS(1_,2_)',
+                'date_trunc(1_,2_)' :'TIMESTAMP_TRUNC(2_, 1_)',
                 'timestamp_ltz' : 'TIMESTAMP',
                 'timestamp_ntz' : 'TIMESTAMP',
-                'abc' : 'ABC',
-                'hello(1,2)' : 'hi(2((2(1))))',
-                'xyz(1)' : 'XYZ(1)',
-                'rrt(1)' : 'RRT(1)',
-                'max(1)' : 'MAX(XYZ(1))'
+                'varchar()' : 'String',
+
                 # below list of func dont need conver:
 
                 }
+direct_conversion = {
+                        'integer':'INT64',
+                        'double' : 'FLOAT64',
+                        'USE ' : '--USE ',
+                        'GRANT ': '--GRANT ',
+                        'UNION' : 'UNION ALL',
+                        '"' : ' '
+
+
+
+}
