@@ -30,7 +30,6 @@ for file in onlyfiles:
     df_regex_map = pre_process.regex_replace(sql_as_string, keyword_maps.regex_map)
     file_name = file.split(r"/")[-1].split('.')[0]
     all_functions = convert_sql.get_functions(sql_as_string)
-    print(all_functions)
     #exit()
     ''' create list of functions conversons to be made'''
     df_converted_func = convert_sql.create_map(all_functions, dict_transaformed, file_name, fallback_ptrn)
@@ -49,19 +48,26 @@ for file in onlyfiles:
 
     file_log = open("log/{}.log".format(file_name), "w+")
 
-
+    # get error report
     result, err = API_Check.API_check(new_sql_as_string)
     if isinstance(result, list):
         errors = result[0]['message']
         if "Syntax error:" in errors:
-            print(errors)
-            logging.error(file +": "+ str(err))
+            print(file_name +": "+ str(errors))
+            logging.error(file +": "+ str(errors))
             for er in str(err):
                 file_log.writelines(er)
 
         else:
-            print("There is no syntax errors")
+            print(file_name +": "+"There is no syntax errors")
             logging.info(file+ ": There is no syntax errors")
+            # get stats
+            job_detail = API_Check.get_stats(new_sql_as_string)
+            if job_detail:
+                val = job_detail.total_bytes_processed
+            else:
+                val = 0
+            logging.info(file+ ": Total bytes processed {}".format(val))
             file_log.write(file+ ": There is no syntax errors")
     file_log.close()
     ''' Creating diff'''
