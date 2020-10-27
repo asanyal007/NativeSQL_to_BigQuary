@@ -10,7 +10,7 @@ def get_functions(sql_as_string):
     list_of_fun_name_new = []
     i = 0
     ptr = "[aA-zZ]+\("
-    ptr2 = "[aA-zA_]+[(']+\w.*?\)+"
+    ptr2 = "[aA-zA_]+[(']+\w.*?\).*\b"
     ptr3 = "{}+[(']+\w.*?\)+"
     for ptr in datatype:
         patrn = ptr3.format(ptr)
@@ -20,7 +20,7 @@ def get_functions(sql_as_string):
     list_of_fun_name = [a.split("(")[0] for a in re.findall(ptr, sql_as_string) if a.split("(")[0] in keys]
     list_of_fun_column_names = re.findall(ptr2, sql_as_string)
 
-    list_of_fun_name.append("contains")
+    #list_of_fun_name.append("contains")
     for s in list_of_fun_name:
         start = sql_as_string.find(s + "(")
         sub_str = sql_as_string[start:len(sql_as_string)]
@@ -107,3 +107,75 @@ def convert_tables(sql_as_string, map):
     #print(sql_as_string)
     #exit()
     return sql_as_string
+
+def convert_reference(sql):
+    regxp_alias = "[aA-zA_]+[(']+\w.*?\)+[ ]as[ ][aA-zZ]+|[aA-zA_]+[(']+\w.*?\)+[ ]AS[ ][aA-zZ]+"
+    selections = re.findall(regxp_alias, sql)
+    #string = "CAST({} AS STRING)"
+    map ={}
+    ''' Creating map for alias'''
+    print(selections)
+    for s in selections:
+        #1print(re.split('as|AS', s))
+        column = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ]+', s)[0]
+        alias = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ]+', s)[1]
+        open_br = column.count("(")
+        closed_br = column.count(")")
+        print("couns: ", open_br, closed_br)
+        if open_br>closed_br:
+            column = column+")"
+        map[alias] = column
+
+    ''' Replacing the alias with function'''
+    function_regxp = "[(']+\w.*?\) "
+    all_parenthesis = re.findall(function_regxp, sql)
+    conversion_map = {}
+    for p in all_parenthesis:
+        for k,v in map.items():
+            print("Holy fuck ", k,v)
+            if k in p:
+                converted = re.sub(r'\b{}\b'.format(k), v, p)
+                conversion_map[p] = converted
+
+    ''' SQL conversion'''
+    for k,v in conversion_map.items():
+        sql = sql.replace(k, v)
+    return sql
+
+
+def get_func(sql_as_string):
+    rexp = "[aA-zA_]+[(']+\w.*?\).*"
+    list_of_fun_name = re.findall(rexp, sql_as_string)
+    open_br = 0
+    closed_br = 0
+    list_of_function = []
+    list_of_fun_name_new = []
+    i = 0
+    list_of_func_name = re.findall("[aA-zZ_]+\(+", sql_as_string)
+    list_of_func_name = {a.split("(")[0]: len(a.split("(")[0]) for a in list_of_func_name}
+    for s in list_of_func_name.keys():
+        p = re.compile(r"\b{}\(".format(s))
+        for a in p.finditer(sql_as_string):
+            # print("string: ",s)
+            start_pos = a.start()
+            for c in sql_as_string[start_pos:len(sql_as_string)]:
+                i = i + 1
+                if "(" in c:
+                    open_br = open_br + 1
+                elif ")" in c:
+                    closed_br = closed_br + 1
+                list_of_function.append(c)
+                if open_br == closed_br and closed_br > 0 and open_br > 0:
+                    print("location: ", s, ''.join(list_of_function))
+                    if not 'WHEN' in ''.join(list_of_function).upper() :
+                        list_of_fun_name_new.append(''.join(list_of_function))
+                    open_br = 0
+                    closed_br = 0
+                    list_of_function = []
+                    break
+
+    return list_of_fun_name_new
+
+
+
+
