@@ -23,16 +23,21 @@ ptr = "[^aA-zZ][^0-9 \W]+"
 
 
 for file in onlyfiles:
-    #file = 'C:/Workspace/SQL_To_BigQ/Objects_Complexity/Complex_SQL/d_all_agent_metrics.sql'
+#file = 'C:/Workspace/SQL_To_BigQ/Objects_Complexity/Complex_SQL/d_replacement_transaction_reporting_aurora.sql'
     sql_file = open(file)
     sql_as_string = sql_file.read()
     dict_transaformed = pre_process.doublecolon_to_standard_cast(sql_as_string)
     df_regex_map = pre_process.regex_replace(sql_as_string, keyword_maps.regex_map)
     file_name = file.split(r"/")[-1].split('.')[0]
     all_functions = convert_sql.get_functions(sql_as_string)
+    print(all_functions)
     #exit()
     ''' create list of functions conversons to be made'''
-    df_converted_func = convert_sql.create_map(all_functions, dict_transaformed, file_name, fallback_ptrn)
+    df_converted_func = convert_sql.create_map(all_functions, dict_transaformed, file_name, main_ptrn)
+
+    ''' Covert tables'''
+    sql_as_string= convert_sql.convert_tables(sql_as_string, API_Check.get_schema())
+    ''' Direct conversions'''
     df_direct_conv = function_convert.map_direct(keyword_maps.direct_conversion)
     new_df = pd.concat([df_converted_func, df_direct_conv, df_regex_map ]).reset_index()
     new_df.to_csv(r"venv\\Func_Dict\\{}.csv".format(file_name))
@@ -72,6 +77,9 @@ for file in onlyfiles:
     file_log.close()
     ''' Creating diff'''
     convert_sql.diff(new_sql_as_string,sql_as_string,diff_file_path, file_name)
+
+    final_function_list = convert_sql.get_functions(new_sql_as_string)
+    print("final functions", final_function_list)
 
 
 
