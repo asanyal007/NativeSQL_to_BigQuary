@@ -3,6 +3,8 @@ import re
 import difflib
 import function_convert
 from keyword_maps import keywords_map, datatype
+
+from API_Check import API_check
 def get_functions(sql_as_string):
     open_br = 0
     closed_br = 0
@@ -40,6 +42,7 @@ def get_functions(sql_as_string):
     return list(set(list_of_function+list_of_fun_name_new+list_of_fun_column_names))
 
 def create_map(all_functions, dict_transaformed, file_name, ptrn):
+    print("all functions: ", all_functions)
     for matches in all_functions:
         '''balnces the opening and closing brackets'''
         open_br = matches.count("(")
@@ -60,7 +63,7 @@ def create_map(all_functions, dict_transaformed, file_name, ptrn):
             dict_transaformed["-"] = function_convert.map_function(matches)
 
     df_converted_func = pd.DataFrame.from_dict(dict_transaformed, orient='index').reset_index()
-    print(dict_transaformed)
+    #print(dict_transaformed)
     df_converted_func = df_converted_func.rename(columns={'index': 'SQL_Functions', 0: 'Converted_Functions'},
                                                  inplace=False)
 
@@ -78,7 +81,7 @@ def convert(sql_as_string,file_path,out_path):
         replace_str = map[map['SQL_Functions'] == s]['Converted_Functions'].iloc[0]
 
         if replace_str != "Not Available":
-            print("replace value", s, replace_str)
+            #print("replace value", s, replace_str)
             #sql_as_string = sql_as_string.replace(s,replace_str)
             redata = re.compile(re.escape(s), re.IGNORECASE)
             sql_as_string = redata.sub(replace_str, sql_as_string)
@@ -108,20 +111,23 @@ def convert_tables(sql_as_string, map):
     #exit()
     return sql_as_string
 
-def convert_reference(sql):
+def  convert_reference(sql):
     regxp_alias = "[aA-zA_]+[(']+\w.*?\)+[ ]as[ ][aA-zZ]+|[aA-zA_]+[(']+\w.*?\)+[ ]AS[ ][aA-zZ]+"
     selections = re.findall(regxp_alias, sql)
     #string = "CAST({} AS STRING)"
     map ={}
     ''' Creating map for alias'''
-    print(selections)
+    key_words = ["DATE","TIMESTAMP"]
+    #print(selections)
     for s in selections:
         #1print(re.split('as|AS', s))
-        column = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ]+', s)[0]
-        alias = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ]+', s)[1]
+        print("splitting: ", s)
+        column = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ][^A-Z]+', s)[0]
+        alias = re.split('\)[ ]+as[ ]+|\)[ ]+AS[ ][^A-Z]+', s)[1]
+        print("col : ",column,"and alias:",alias)
         open_br = column.count("(")
         closed_br = column.count(")")
-        print("couns: ", open_br, closed_br)
+        #print("couns: ", open_br, closed_br)
         if open_br>closed_br:
             column = column+")"
         map[alias] = column
@@ -132,15 +138,11 @@ def convert_reference(sql):
     conversion_map = {}
     for p in all_parenthesis:
         for k,v in map.items():
-            print("Holy fuck ", k,v)
             if k in p:
-                converted = re.sub(r'\b{}\b'.format(k), v, p)
+                converted = re.sub(r'[^.]{}\b'.format(k), v, p)
                 conversion_map[p] = converted
 
-    ''' SQL conversion'''
-    for k,v in conversion_map.items():
-        sql = sql.replace(k, v)
-    return sql
+
 
 
 def get_func(sql_as_string):
@@ -166,7 +168,7 @@ def get_func(sql_as_string):
                     closed_br = closed_br + 1
                 list_of_function.append(c)
                 if open_br == closed_br and closed_br > 0 and open_br > 0:
-                    print("location: ", s, ''.join(list_of_function))
+                    #print("location: ", s, ''.join(list_of_function))
                     if not 'WHEN' in ''.join(list_of_function).upper() :
                         list_of_fun_name_new.append(''.join(list_of_function))
                     open_br = 0
